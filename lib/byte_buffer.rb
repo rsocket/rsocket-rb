@@ -104,5 +104,5 @@ def bytes_to_integer(bytes)
     integer = integer + (x << 8 * offset)
     offset = offset + 1
   end
-  puts integer
+  integer
 end
