@@ -31,7 +31,7 @@ class ByteBuffer
   def get_bytes(len)
     if @pos + len <= @size
       @pos = @pos + len
-      @buffer[(@pos - len)..(@pos-1)]
+      @buffer[(@pos - len)..(@pos - 1)]
     end
   end
 
@@ -46,16 +46,17 @@ class ByteBuffer
 
 
   def put(byte)
-    if @pos < @size
-      @buffer[@pos] = byte
-      @pos = @pos + 1
-    end
+    @buffer[@pos] = byte
+    @pos = @pos + 1
   end
 
   # puts bytes
   # @param bytes [Array]
   def put_bytes(bytes)
-    bytes.each(&method(:put))
+    bytes.each do |x|
+      @buffer[@pos] = x
+      @pos = @pos + 1
+    end
   end
 
   def put_int32(integer)
