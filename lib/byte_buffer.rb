@@ -101,7 +101,6 @@ def bytes_to_integer(bytes)
   integer = 0
   offset = 0
   bytes.reverse.each do |x|
-    puts x
     integer = integer + (x << 8 * offset)
     offset = offset + 1
   end
