@@ -57,3 +57,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## References
 
 * EventMachine: fast, simple event-processing library for Ruby programs https://github.com/eventmachine/eventmachine
+* Yard Cheat Sheet: https://kapeli.com/cheat_sheets/Yard.docset/Contents/Resources/Documents/index
