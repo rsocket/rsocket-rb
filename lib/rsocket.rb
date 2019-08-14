@@ -3,6 +3,13 @@ require 'eventmachine'
 
 $options = Hash[:port => 42252, :schema => "tcp"]
 
+class Payload
+  def initialize(data, metadata)
+    @data = data
+    @metadata = metadata
+  end
+end
+
 module RSocketResponder
 
   def set(option)
