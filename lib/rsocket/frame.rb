@@ -54,8 +54,22 @@ module RSocket
     end
 
     # @param array [Array<Byte>] frame array
-    def parse(array)
-
+    # @return [Frame] frame
+    def self.parse(array)
+      buffer = RSocket::ByteBuffer.new(array)
+      length = buffer.get_int24
+      stream_id = buffer.get_int32
+      byte = buffer.get
+      frame_type = byte >> 2
+      has_metadata = byte % 2
+      flags = buffer.get
+      metadata = nil
+      if has_metadata == 1
+        metadata_length = buffer.get_int24
+        metadata = buffer.get_bytes metadata_length
+      end
+      data = buffer.get_remain
+      Frame.new(FRAME_TYPES.key(frame_type), payload_of(data,metadata),stream_id)
     end
 
   end
@@ -63,5 +77,6 @@ module RSocket
   class SetupFrame < Frame
 
   end
+
 
 end
