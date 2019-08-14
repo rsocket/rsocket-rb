@@ -5,7 +5,7 @@ module RSocket
     attr_reader :pos, :size
 
     # create buffer from byte array
-    # @param bytes [Array]
+    # @param bytes [Array] byte array
     def initialize(bytes)
       @buffer = bytes
       @pos = 0
@@ -34,6 +34,12 @@ module RSocket
       if @pos + len <= @size
         @pos = @pos + len
         @buffer[(@pos - len)..(@pos - 1)]
+      end
+    end
+
+    def get_remain
+      if @pos <= @size
+        @buffer[@pos, @size]
       end
     end
 
@@ -83,30 +89,30 @@ module RSocket
       bytes = Array.new(size, 0x0)
       ByteBuffer.new(bytes)
     end
-  end
 
-# convert integer to bytes
-# @param i [Integer]
-# @return [Array]
-  def integer_to_bytes(i)
-    bj = Array.new(4, 0x00)
-    bj[0] = (i & 0xff000000) >> 24
-    bj[1] = (i & 0xff0000) >> 16
-    bj[2] = (i & 0xff00) >> 8
-    bj[3] = i & 0xff
-    bj
-  end
-
-# convert bytes to integer
-# @param bytes [Array]
-# @return [Integer]
-  def bytes_to_integer(bytes)
-    integer = 0
-    offset = 0
-    bytes.reverse.each do |x|
-      integer = integer + (x << 8 * offset)
-      offset = offset + 1
+    # convert integer to bytes
+    # @param i [Integer]
+    # @return [Array]
+    def integer_to_bytes(i)
+      bj = Array.new(4, 0x00)
+      bj[0] = (i & 0xff000000) >> 24
+      bj[1] = (i & 0xff0000) >> 16
+      bj[2] = (i & 0xff00) >> 8
+      bj[3] = i & 0xff
+      bj
     end
-    integer
+
+    # convert bytes to integer
+    # @param bytes [Array]
+    # @return [Integer]
+    def bytes_to_integer(bytes)
+      integer = 0
+      offset = 0
+      bytes.reverse.each do |x|
+        integer = integer + (x << 8 * offset)
+        offset = offset + 1
+      end
+      integer
+    end
   end
 end
