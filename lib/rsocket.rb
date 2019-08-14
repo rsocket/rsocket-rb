@@ -26,9 +26,9 @@ module RSocketServer
     puts "-- someone connected to the echo server!"
   end
 
-  def receive_data data
+  def receive_data(data)
     send_data ">>> you sent: #{data}"
-    request_response data
+    request_response data.unpack('C*')
   end
 end
 
