@@ -25,15 +25,19 @@ Or install it yourself as:
 * RSocket Server
 ```
 require 'rsocket'
+require 'rsocket/payload'
 
-set :schema => 'tcp', :port => 42252
+set :schema, 'tcp'
+set :port, 42253
 
 
-class RSocketResponder < rsocket::AbstractRSocket
-    def request_response(payload) do
-       # payload
-    end
+# RSocket request/response
+# @param payload [Payload] rsocket payload
+def request_response(payload)
+  print "RPC called"
+  payload_of("data", "metadata")
 end
+
 ```
 
 
@@ -56,5 +60,6 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## References
 
+* EventMachine Code Snippets: https://github.com/eventmachine/eventmachine/wiki/Code-Snippets
 * EventMachine: fast, simple event-processing library for Ruby programs https://github.com/eventmachine/eventmachine
 * Yard Cheat Sheet: https://kapeli.com/cheat_sheets/Yard.docset/Contents/Resources/Documents/index
