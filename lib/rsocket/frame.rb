@@ -1,0 +1,67 @@
+require 'rubygems'
+require 'rsocket/byte_buffer'
+
+module RSocket
+
+  MAJOR_VERSION = "1"
+  MINOR_VERSION = "0"
+
+  FRAME_TYPES = Hash[:SETUP => 0x01, :LEASE => 0x02, :KEEPALIVE => 0x03,
+                     :REQUEST_RESPONSE => 0x04, :REQUEST_FNF => 0x05, :REQUEST_STREAM => 0x06, :REQUEST_CHANNEL => 0x07,
+                     :REQUEST_N => 0x08, :CANCEL => 0x09, :PAYLOAD => 0x0A, :ERROR => 0x0B, :METADATA_PUSH => 0x0C,
+                     :RESUME => 0x0D, :RESUME_OK => 0x0E, :EXT => 0xFFFF]
+
+  ERROR_CODES = Hash[:INVALID_SETUP => 0x00000001, :UNSUPPORTED_SETUP => 0x00000002, :REJECTED_SETUP => 0x00000003,
+                     :REJECTED_RESUME => 0x00000004, :CONNECTION_ERROR => 0x00000101, :CONNECTION_CLOSE => 0x00000102,
+                     :APPLICATION_ERROR => 0x00000201, :REJECTED => 0x00000202, :CANCELED => 0x00000203, :INVALID => 0x00000204]
+  class Frame
+
+    # @param frame_type [Symbol] frame type
+    # @param payload [RSocket::Payload] rsocket payload
+    # @param stream_id [Integer] rsocket payload
+    def initialize(frame_type, payload, stream_id)
+      @frame_type = frame_type
+      @payload = payload
+      @stream_id = stream_id
+      @flags = 0x0
+      if payload.metadata.nil?
+        @length = 4 + 2 + payload.bytes_length
+      else
+        @length = 4 + 2 + 3 + payload.bytes_length
+      end
+    end
+
+    # @return [Array<Byte>] frame byte array
+    def serialize
+      bytes = Array.new(@length + 3)
+      buffer = RSocket::ByteBuffer.new(bytes)
+      buffer.put_int24 @length
+      buffer.put_int32 @stream_id
+      if @payload.metadata.nil?
+        buffer.put(FRAME_TYPES[@frame_type] << 2)
+      else
+        buffer.put((FRAME_TYPES[@frame_type] << 2) + 1)
+      end
+      buffer.put @flags
+      unless @payload.metadata.nil?
+        buffer.put_int24 @payload.metadata.length
+        buffer.put_bytes @payload.metadata
+      end
+      unless @payload.data.nil?
+        buffer.put_bytes @payload.data
+      end
+      bytes
+    end
+
+    # @param array [Array<Byte>] frame array
+    def parse(array)
+
+    end
+
+  end
+
+  class SetupFrame < Frame
+
+  end
+
+end
