@@ -1,15 +1,14 @@
 require 'rubygems'
 require 'eventmachine'
 
-$options = Hash[:port => 42252, :schema => "tcp", :host => '0.0.0.0']
 
 module RSocket
-
+  OPTIONS = Hash[:port => 42252, :schema => "tcp", :host => '0.0.0.0']
 
   module RSocketResponder
 
     def set(name, value)
-      $options[name] = value
+      OPTIONS[name] = value
     end
   end
 
@@ -23,19 +22,17 @@ module RSocket
 
     def receive_data(data)
       send_data ">>> you sent: #{data}"
-      request_response data.unpack('C*')
+      p data.unpack('C*')
     end
 
   end
 end
 
-
 extend RSocket::RSocketResponder
-
 
 at_exit do
   EventMachine::run {
-    EventMachine::start_server $options[:host], $options[:port], RSocket::RSocketServer
-    puts "RSocket Server on #{$options[:port]}"
+    EventMachine::start_server RSocket::OPTIONS[:host],RSocket::OPTIONS[:port], RSocket::RSocketServer
+    puts "RSocket Server on #{RSocket::OPTIONS[:port]}"
   }
 end
