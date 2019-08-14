@@ -7,5 +7,8 @@ module RSocket
     end
   end
 
+end
 
+def payload_of(data, metadata)
+  RSocket::Payload.new(data, metadata)
 end
