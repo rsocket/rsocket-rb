@@ -16,6 +16,8 @@ module RSocket
                      :APPLICATION_ERROR => 0x00000201, :REJECTED => 0x00000202, :CANCELED => 0x00000203, :INVALID => 0x00000204]
   class Frame
 
+    attr_accessor :frame_type, :stream_id, :payload, :flags
+
     # @param frame_type [Symbol] frame type
     # @param payload [RSocket::Payload] rsocket payload
     # @param stream_id [Integer] rsocket payload
