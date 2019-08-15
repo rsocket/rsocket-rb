@@ -19,17 +19,19 @@ module RSocket
     attr_accessor :frame_type, :stream_id, :payload, :flags
 
     # @param frame_type [Symbol] frame type
-    # @param payload [RSocket::Payload] rsocket payload
+    # @param metadata [Array] rsocket payload
+    # @param data [Array] rsocket payload
     # @param stream_id [Integer] rsocket payload
-    def initialize(frame_type, payload, stream_id)
+    def initialize(frame_type, metadata, data, stream_id)
       @frame_type = frame_type
-      @payload = payload
+      @metadata = metadata
+      @data = data
       @stream_id = stream_id
       @flags = 0x0
-      if payload.metadata.nil?
-        @length = 4 + 2 + payload.bytes_length
+      if metadata.nil?
+        @length = 4 + 2 + data.length
       else
-        @length = 4 + 2 + 3 + payload.bytes_length
+        @length = 4 + 2 + 3 + metadata.length + (data.nil? ? 0 : data.length)
       end
     end
 
@@ -39,18 +41,18 @@ module RSocket
       buffer = RSocket::ByteBuffer.new(bytes)
       buffer.put_int24 @length
       buffer.put_int32 @stream_id
-      if @payload.metadata.nil?
+      if @metadata.nil?
         buffer.put(FRAME_TYPES[@frame_type] << 2)
       else
         buffer.put((FRAME_TYPES[@frame_type] << 2) + 1)
       end
       buffer.put @flags
-      unless @payload.metadata.nil?
-        buffer.put_int24 @payload.metadata.length
-        buffer.put_bytes @payload.metadata
+      unless @metadata.nil?
+        buffer.put_int24 @metadata.length
+        buffer.put_bytes @metadata
       end
-      unless @payload.data.nil?
-        buffer.put_bytes @payload.data
+      unless @data.nil?
+        buffer.put_bytes @data
       end
       bytes
     end
@@ -71,7 +73,7 @@ module RSocket
         metadata = buffer.get_bytes metadata_length
       end
       data = buffer.get_remain
-      Frame.new(FRAME_TYPES.key(frame_type), payload_of(data,metadata),stream_id)
+      Frame.new(FRAME_TYPES.key(frame_type), metadata, data, stream_id)
     end
 
   end
