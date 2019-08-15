@@ -52,6 +52,10 @@ module RSocket
       bytes_to_integer(get_bytes(3))
     end
 
+    def get_int16
+      bytes_to_integer(get_bytes(2))
+    end
+
 
     def put(byte)
       @buffer[@pos] = byte
@@ -73,6 +77,10 @@ module RSocket
 
     def put_int24(integer)
       integer_to_bytes(integer)[1..3].each(&method(:put))
+    end
+
+    def put_int16(integer)
+      integer_to_bytes(integer)[1..2].each(&method(:put))
     end
 
     def rewind
