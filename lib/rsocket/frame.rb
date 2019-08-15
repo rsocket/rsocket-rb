@@ -14,6 +14,9 @@ module RSocket
   ERROR_CODES = Hash[:INVALID_SETUP => 0x00000001, :UNSUPPORTED_SETUP => 0x00000002, :REJECTED_SETUP => 0x00000003,
                      :REJECTED_RESUME => 0x00000004, :CONNECTION_ERROR => 0x00000101, :CONNECTION_CLOSE => 0x00000102,
                      :APPLICATION_ERROR => 0x00000201, :REJECTED => 0x00000202, :CANCELED => 0x00000203, :INVALID => 0x00000204]
+  FLAG_IGNORE_BIT = 0x200
+  FLAG_METADATA_BIT = 0x100
+
   class Frame
 
     attr_accessor :frame_type, :stream_id, :payload, :flags
@@ -27,11 +30,12 @@ module RSocket
       @metadata = metadata
       @data = data
       @stream_id = stream_id
-      @flags = 0x0
+      @flags = 0
       if metadata.nil?
         @length = 4 + 2 + data.length
       else
         @length = 4 + 2 + 3 + metadata.length + (data.nil? ? 0 : data.length)
+        @flags = @flags | FLAG_METADATA_BIT
       end
     end
 
@@ -41,12 +45,8 @@ module RSocket
       buffer = RSocket::ByteBuffer.new(bytes)
       buffer.put_int24 @length
       buffer.put_int32 @stream_id
-      if @metadata.nil?
-        buffer.put(FRAME_TYPES[@frame_type] << 2)
-      else
-        buffer.put((FRAME_TYPES[@frame_type] << 2) + 1)
-      end
-      buffer.put @flags
+      frame_type_and_flags = (FRAME_TYPES[@frame_type] << 10) + @flags
+      buffer.put_int16 frame_type_and_flags
       unless @metadata.nil?
         buffer.put_int24 @metadata.length
         buffer.put_bytes @metadata
