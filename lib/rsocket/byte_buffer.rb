@@ -80,7 +80,7 @@ module RSocket
     end
 
     def put_int16(integer)
-      integer_to_bytes(integer)[1..2].each(&method(:put))
+      integer_to_bytes(integer)[2..3].each(&method(:put))
     end
 
     def rewind
