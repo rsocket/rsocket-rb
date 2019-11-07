@@ -1,6 +1,6 @@
 require "test_helper"
 
-require 'byte_buffer'
+require 'rsocket/byte_buffer'
 
 class ByteBufferTest < Minitest::Test
 
@@ -33,5 +33,19 @@ class ByteBufferTest < Minitest::Test
     buffer = ByteBuffer.new([0x00, 0x00, 0x02, 0x01])
     assert_equal 2, buffer.get_int24
   end
+
+  def test_array_push
+    bytes = Array.new(4, 0x00)
+    bytes[1, 2] = [2, 3]
+    bytes.push(*[2, 3, 4])
+    p bytes
+  end
+
+  def test_bit_validation
+    byte = 0x10
+    assert_equal byte[4], 1
+  end
+
+
 end
 
