@@ -6,10 +6,9 @@ require 'rx'
 
 
 EventMachine.run {
-  #rsocket = EventMachine.connect '127.0.0.1', 1235, AppRequester
-  rsocket = RSocket.connect("tcp://127.0.0.1:42252", "x/x", "y/y", nil) do
+  rsocket = RSocket.connect("tcp://127.0.0.1:42252") do
     def request_response(payload)
-      puts "request/response called"
+      puts "request_response received: #{payload.data_utf8}"
       Rx::Observable.just(payload_of("data", "metadata"))
     end
   end
