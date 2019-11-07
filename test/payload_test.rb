@@ -27,5 +27,9 @@ class PayloadTest < Minitest::Test
     payload = [0, 0, 23, 0, 0, 0, 1, 17, 0, 0, 0, 8, 109, 101, 116, 97, 100, 97, 116, 97, 100, 97, 116, 97, 45, 49]
   end
 
+  def test_string_payload
+    payload = payload_of("data", "metadata")
+    p payload
+  end
 end
 
