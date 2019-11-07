@@ -9,6 +9,7 @@ GEM
     eventmachine (1.2.7)
     minitest (5.11.3)
     rake (10.5.0)
+    rx (0.0.3)
 
 PLATFORMS
   ruby
@@ -19,6 +20,7 @@ DEPENDENCIES
   minitest (~> 5.0)
   rake (~> 10.0)
   rsocket-rb!
+  rx
 
 BUNDLED WITH
    2.0.1
