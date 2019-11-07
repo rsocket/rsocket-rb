@@ -4,7 +4,7 @@ rsocket-rb
 Ruby implementation of [RSocket](http://rsocket.io)
 
 
-## Installation
+# Installation
 
 Add this line to your application's Gemfile:
 
@@ -20,46 +20,79 @@ Or install it yourself as:
 
     $ gem install rsocket-rb
 
-## Usage
+# How to use?
 
-* RSocket Server
-```
-require 'rsocket'
+* RSocket Server with Sinatra style
+
+```ruby
+require 'rsocket/server_bootstrap'
 require 'rsocket/payload'
+require 'rx'
 
 set :schema, 'tcp'
-set :port, 42253
+set :port, 42252
 
-
-# RSocket request/response
-# @param payload [Payload] rsocket payload
+# @param payload [RSocket::Payload]
+#@return [Rx::Observable]
 def request_response(payload)
-  print "RPC called"
-  payload_of("data", "metadata")
+  puts "request/response called"
+  Rx::Observable.just(payload_of("data", "metadata"))
 end
 
 ```
 
-
 * RSocket Client
 
+```ruby
+require 'rubygems'
+require 'eventmachine'
+require 'rsocket/requester'
+require 'rsocket/payload'
+require 'rx'
+
+
+EventMachine.run {
+  #rsocket = EventMachine.connect '127.0.0.1', 1235, AppRequester
+  rsocket = RSocket.connect("tcp://127.0.0.1:42252")
+  rsocket.request_response(payload_of("request", "response"))
+      .subscribe(Rx::Observer.configure do |observer|
+        observer.on_next { |payload| puts payload.data_utf8 }
+        observer.on_completed { puts "completed" }
+        observer.on_error { |error| puts error }
+      end)
+
+}
 ```
-require 'rsocket'
 
-client = rsocket.connect().transport("tcp://127.0.0.1:42252").start()
-client.request_response(payload("data","metadata"))
+# Todo 
 
-```
+#### Transport
+ - [x] TCP
+ - [ ] Websocket
+
+#### Duplex Socket
+ - [x] MetadataPush
+ - [x] RequestFNF
+ - [x] RequestResponse
+ - [x] RequestStream
+ - [x] RequestChannel
+
+##### Others
+ - [x] Composite Metadata
+ - [ ] TCK Test
+ - [x] Timeout support
+ - [ ] Resume
+ - [x] Keepalive
+ - [ ] Fragmentation
+ - [ ] Cancel
+ - [x] Error
+ - [ ] Flow Control: RequestN
+ - [ ] Flow Control: Lease
+ - [x] Load Balance
 
 
-## Development
+# References
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## References
-
-* EventMachine Code Snippets: https://github.com/eventmachine/eventmachine/wiki/Code-Snippets
+* RSocket Home: http://rsocket.io/
 * EventMachine: fast, simple event-processing library for Ruby programs https://github.com/eventmachine/eventmachine
-* Yard Cheat Sheet: https://kapeli.com/cheat_sheets/Yard.docset/Contents/Resources/Documents/index
+* RxRuby: https://github.com/ReactiveX/RxRuby
