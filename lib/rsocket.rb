@@ -1,2 +1,2 @@
 require 'rubygems'
-require 'rsocket/main'
+require 'rsocket/version'
