@@ -108,6 +108,7 @@ module RSocket
       stream_frame = RequestStreamFrame.new(next_stream_id)
       stream_frame.metadata = payload.metadata
       stream_frame.data = payload.data
+      send_frame(stream_frame)
       response_subject = Rx::AsyncSubject.new
       @streams[stream_frame.stream_id] = response_subject
       response_subject
