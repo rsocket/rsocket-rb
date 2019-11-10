@@ -55,6 +55,14 @@ module RSocket
       end
     end
 
+    #@param payload_frame [RSocket:PayloadFrame]
+    def receive_response(payload_frame)
+      # response for send rsocket
+      if payload_frame.stream_id % 2 == 1
+        @sending_rsocket.receive_response(payload_frame)
+      end
+    end
+
     def dispose
       close_connection(true)
       @onclose.on_completed
@@ -65,53 +73,108 @@ module RSocket
     end
 
 
-    class SendingRSocket
-      include RSocket::AbstractRSocket
+  end
 
-      def initialize(parent)
-        @parent = parent
-      end
+  class SendingRSocket
+    include RSocket::AbstractRSocket
+    @next_stream_id = -1
+    @streams = {}
 
-      def fire_and_forget(payload)
-        EventMachine.defer(proc {
-          fnf_frame = RequestFnfFrame.new(next_stream_id)
-          fnf_frame.metadata = payload.metadata
-          fnf_frame.data = payload.data
-          @parent.send_frame(fnf_frame)
-        })
-      end
+    def initialize(rsocket_responder)
+      @rsocket_responder = rsocket_responder
+    end
 
-      #@param payload [RSocket::Payload]
-      #@return [Rx::Observable]
-      def request_response(payload)
-        raise 'request_response not implemented'
-      end
-
-      def request_stream(payload)
-        raise 'request_stream not implemented'
-      end
-
-      def request_channel(payloads)
-        raise 'request_channel not implemented'
-      end
-
-      def metadata_push(payloads)
-        if !payload.metadata.nil? && payload.metadata.length > 0
-          EventMachine.defer(proc {
-            metadata_push_frame = MetadataPushFrame.new
-            metadata_push_frame.metadata = payload.metadata
-            @parent.send_frame(metadata_push_frame)
-          })
+    #@param payload_frame [RSocket:PayloadFrame]
+    def receive_response(payload_frame)
+      stream_id = payload_frame.stream_id
+      #error frame type
+      if payload_frame.frame_type == :ERROR
+        subject = @streams.delete(stream_id)
+        unless subject.nil?
+          subject.on_error(payload_frame.error_code)
         end
       end
-
-      def dispose
-        @parent.dispose
+      if payload_frame.is_completed
+        subject = @streams.delete(stream_id)
+        unless subject.nil?
+          subject.on_next(payload_of(payload_frame.data, payload_frame.metadata))
+          subject.on_completed
+        end
+      else
+        subject = @streams[stream_id]
+        unless subject.nil?
+          subject.on_next(payload_of(payload_frame.data, payload_frame.metadata))
+        end
       end
+    end
 
+    def fire_and_forget(payload)
+      EventMachine.defer(proc {
+        fnf_frame = RequestFnfFrame.new(next_stream_id)
+        fnf_frame.metadata = payload.metadata
+        fnf_frame.data = payload.data
+        @rsocket_responder.send_frame(fnf_frame)
+      })
+    end
+
+    #@param payload [RSocket::Payload]
+    #@return [Rx::Observable]
+    def request_response(payload)
+      request_response_frame = RequestResponseFrame.new(next_stream_id)
+      request_response_frame.data = payload.data
+      request_response_frame.metadata = payload.metadata
+      @rsocket_responder.send_frame(request_response_frame)
+      response_subject = Rx::AsyncSubject.new
+      stream_id = request_response_frame.stream_id
+      @streams[request_response_frame.stream_id] = response_subject
+      # add timeout support because rxRuby without timeout operator
+      # todo make it configurable
+      EventMachine::Timer.new(15) do
+        subject = @streams.delete(stream_id)
+        unless subject.nil?
+          subject.on_error("Timeout: 15s")
+        end
+      end
+      response_subject
+    end
+
+    def request_stream(payload)
+      stream_frame = RequestStreamFrame.new(next_stream_id)
+      stream_frame.metadata = payload.metadata
+      stream_frame.data = payload.data
+      @rsocket_responder.send_frame(stream_frame)
+      response_subject = Rx::AsyncSubject.new
+      @streams[stream_frame.stream_id] = response_subject
+      response_subject
+    end
+
+    def request_channel(payloads)
+      raise 'request_channel not implemented'
+    end
+
+    def metadata_push(payloads)
+      if !payload.metadata.nil? && payload.metadata.length > 0
+        EventMachine.defer(proc {
+          metadata_push_frame = MetadataPushFrame.new
+          metadata_push_frame.metadata = payload.metadata
+          @rsocket_responder.send_frame(metadata_push_frame)
+        })
+      end
+    end
+
+    def dispose
+      @parent.dispose
+    end
+
+    def next_stream_id
+      begin
+        @next_stream_id = @next_stream_id + 2
+      end until @streams[@next_stream_id].nil?
+      @next_stream_id
     end
 
   end
+
 
   class RSocketServer
     attr_accessor :connections, :option
