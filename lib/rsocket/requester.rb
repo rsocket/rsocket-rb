@@ -77,8 +77,8 @@ module RSocket
 
     def request_response(payload)
       request_response_frame = RequestResponseFrame.new(next_stream_id)
-      request_response_frame.data = "Hello".unpack("C*")
-      request_response_frame.metadata = "metadata".unpack("C*")
+      request_response_frame.data = payload.data
+      request_response_frame.metadata =  payload.data
       send_frame(request_response_frame)
       response_subject = Rx::AsyncSubject.new
       stream_id = request_response_frame.stream_id
