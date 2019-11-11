@@ -16,4 +16,15 @@ module RSocket
     UNSUPPORTED_SETUP = 0x00000002
   end
 
+  class RSocketException< Exception
+    attr_accessor :code, :message
+
+    def initialize(code, message)
+      @code = code
+      @message = message
+    end
+
+  end
+
+
 end
