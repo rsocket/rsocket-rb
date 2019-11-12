@@ -1,2 +1,8 @@
 require 'rubygems'
 require 'rsocket/version'
+require 'rsocket/wellknown_mimetypes'
+require 'rsocket/composite_metadata'
+require 'rsocket/error_type'
+require 'rsocket/payload'
+require 'rx'
+require 'rsocket/abstract_rsocket'
