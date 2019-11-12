@@ -68,7 +68,7 @@ EventMachine.run {
 
 #### Transport
  - [x] TCP
- - [ ] Websocket
+ - [ ] Websocket: em-websocket
 
 #### Duplex Socket
  - [x] MetadataPush
