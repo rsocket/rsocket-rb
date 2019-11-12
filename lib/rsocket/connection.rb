@@ -61,7 +61,11 @@ module RSocket
         mono = (@mode == :SERVER) ? request_response(request_payload) : @responder_handler.request_response(request_payload)
         mono.subscribe(
             lambda { |payload|
-              payload_frame = PayloadFrame.new(frame.stream_id, 0x40)
+              flags = 0x40
+              if !payload.data.nil? or !payload.metadata.nil?
+                flags = flags | 0x20
+              end
+              payload_frame = PayloadFrame.new(frame.stream_id, flags)
               payload_frame.data = payload.data
               payload_frame.metadata = payload.metadata
               send_frame(payload_frame)
