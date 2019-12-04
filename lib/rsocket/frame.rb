@@ -106,7 +106,7 @@ module RSocket
 
   class SetupFrame < Frame
 
-    attr_accessor :metadata_encoding, :data_encoding, :resume_token
+    attr_accessor :metadata_encoding, :data_encoding, :resume_token, :keepalive_time, :max_life_time
 
     def initialize(flags)
       super(0, :SETUP)
@@ -114,7 +114,7 @@ module RSocket
       @major_version = RSocket::MAJOR_VERSION
       @minor_version = RSocket::MINOR_VERSION
       @keepalive_time = 3000
-      @max_life_time = 0x7FFFFFFF
+      @max_life_time = 12000
     end
 
     #@param buffer [RSocket::ByteBuffer]
