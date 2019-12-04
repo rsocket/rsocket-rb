@@ -41,10 +41,15 @@ module RSocket
         setup_frame.data = @setup_payload.data
       end
       send_frame(setup_frame)
+      @timer = EventMachine::PeriodicTimer.new(5) do
+        keep_alive_frame = KeepAliveFrame.new(0x80)
+        send_frame(keep_alive_frame)
+      end
     end
 
     def unbind
       @onclose.on_completed
+      @timer.cancel
     end
 
     def dispose
