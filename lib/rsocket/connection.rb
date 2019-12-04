@@ -36,7 +36,7 @@ module RSocket
           # request N
         when :KEEPALIVE
           # Respond with KEEPALIVE
-          if flags[7] == 1
+          if frame.flags[7] == 1
             frame_bytes[8] = 0
             send_data(frame_bytes.pack('C*'))
           end
