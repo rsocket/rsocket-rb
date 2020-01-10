@@ -63,6 +63,9 @@ module RSocket
     RSOCKET_DATA_ENCODING = WellKnownType.new("message/x.rsocket.data.encoding.v0", 0x52, :RSOCKET_DATA_ENCODING)
     RSOCKET_BEARER_TOKEN = WellKnownType.new("message/x.rsocket.authentication.bearer.v0", 0x55, :RSOCKET_BEARER_TOKEN)
     # ...
+    RSOCKET_MESSAGE_MIMETYPE = WellKnownType.new("message/x.rsocket.mime-type.v0", 0x7A, :RSOCKET_MESSAGE_MIMETYPE)
+    RSOCKET_ACCEPT_MIMETYPES = WellKnownType.new("message/x.rsocket.accept-mime-types.v0", 0x7B, :RSOCKET_ACCEPT_MIMETYPES)
+    RSOCKET_AUTHENTICATION = WellKnownType.new("message/x.rsocket.authentication.v0", 0x7C, :RSOCKET_AUTHENTICATION)
     RSOCKET_TRACING_ZIPKIN = WellKnownType.new("message/x.rsocket.tracing-zipkin.v0", 0x7D, :RSOCKET_TRACING_ZIPKIN)
     RSOCKET_ROUTING = WellKnownType.new("message/x.rsocket.routing.v0", 0x7E, :RSOCKET_ROUTING)
     RSOCKET_COMPOSITE_METADATA = WellKnownType.new("message/x.rsocket.composite-metadata.v0", 0x7F, :RSOCKET_COMPOSITE_METADATA)
