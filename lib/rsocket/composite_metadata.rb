@@ -123,6 +123,7 @@ module RSocket
     end
   end
 
+
   #@return [ExplicitMimeTypeEntry]
   # @param routing [String]
   def self.routing_metadata(routing, *tags)
@@ -139,15 +140,15 @@ module RSocket
   end
 
   #@param data_encoding [Symbol]
+  #@return [Array]
+  def self.data_encoding_metadata_byte(data_encoding)
+      return [RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier] | 0x80
+  end
+
   #@param accept_encoding [Symbol]
   #@return [Array]
-  def self.data_encoding_metadata_bytes(data_encoding, accept_encoding = nil)
-    if accept_encoding.nil?
-      return [RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier]
-    else
-      return [RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier,
-              RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[accept_encoding].identifier]
-    end
+  def self.accept_encoding_metadata_byte(accept_encoding = nil)
+    return [RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier] | 0x80
   end
 
 end
