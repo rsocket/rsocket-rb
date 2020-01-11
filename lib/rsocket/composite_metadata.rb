@@ -145,10 +145,10 @@ module RSocket
       return [RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier] | 0x80
   end
 
-  #@param accept_encoding [Symbol]
+  #@param accept_encodings [Array]
   #@return [Array]
-  def self.accept_encoding_metadata_byte(accept_encoding = nil)
-    return [RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier] | 0x80
+  def self.accept_encodings_metadata_bytes(accept_encodings)
+    return accept_encodings.map { |data_encoding|  RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier | 0x80 }
   end
 
 end
