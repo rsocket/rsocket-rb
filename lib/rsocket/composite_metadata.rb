@@ -4,8 +4,8 @@ require 'rsocket/wellknown_mimetypes'
 module RSocket
   class CompositeMetadata
     # @param source [Array]
-    def initialize(source = [])
-      @source = source
+    def initialize(source = nil)
+      @source = source || []
     end
 
     def to_bytes
@@ -13,10 +13,11 @@ module RSocket
     end
 
     # convert integer to bytes
-    # @param mime_type_id [Integer]
+    # @param mime_type_symbol [Symbol]
     # @param content [Array]
-    def add_wellknown_metadata(mime_type_id, content)
+    def add_wellknown_metadata(mime_type_symbol, content)
       content_length = content.length
+      mime_type_id = RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[mime_type_symbol].identifier
       bytes = Array.new(4 + content_length, 0x00)
       bytes[0] = mime_type_id | 0x80
       bytes[1, 3] = RSocket::ByteBuffer.integer_to_bytes(content_length)[1..3]
