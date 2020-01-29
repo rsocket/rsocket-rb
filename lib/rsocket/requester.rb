@@ -84,7 +84,7 @@ module RSocket
     def request_response(payload)
       request_response_frame = RequestResponseFrame.new(next_stream_id)
       request_response_frame.data = payload.data
-      request_response_frame.metadata =  payload.data
+      request_response_frame.metadata = payload.metadata
       send_frame(request_response_frame)
       response_subject = Rx::AsyncSubject.new
       stream_id = request_response_frame.stream_id
@@ -144,7 +144,7 @@ module RSocket
     end
   end
 
-  def self.connect(rsocket_uri, metadata_encoding = "message/x.rsocket.composite-metadata.v0", data_encoding = "text/plain", setup_payload = nil, &resp_handler_block)
+  def self.connect(rsocket_uri, metadata_encoding: "message/x.rsocket.composite-metadata.v0", data_encoding: "text/plain", setup_payload: nil, &resp_handler_block)
     uri = URI.parse(rsocket_uri)
     EventMachine::connect uri.hostname, uri.port, RSocketRequester, metadata_encoding, data_encoding, setup_payload, resp_handler_block
   end
