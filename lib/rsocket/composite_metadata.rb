@@ -5,7 +5,11 @@ module RSocket
   class CompositeMetadata
     # @param source [Array]
     def initialize(source = nil)
-      @source = source || []
+      if source.nil?
+        @source = []
+      else
+        @source = source
+      end
     end
 
     def to_bytes
@@ -143,13 +147,13 @@ module RSocket
   #@param data_encoding [Symbol]
   #@return [Array]
   def self.data_encoding_metadata_byte(data_encoding)
-      return [RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier] | 0x80
+    return [RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier] | 0x80
   end
 
   #@param accept_encodings [Array]
   #@return [Array]
   def self.accept_encodings_metadata_bytes(accept_encodings)
-    return accept_encodings.map { |data_encoding|  RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier | 0x80 }
+    return accept_encodings.map { |data_encoding| RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[data_encoding].identifier | 0x80 }
   end
 
 end
