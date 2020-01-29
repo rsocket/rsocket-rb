@@ -7,7 +7,7 @@ class CompositeMetadataTest < Minitest::Test
 
   def test_create
     composite_metadata = RSocket::CompositeMetadata.new
-    composite_metadata.add_wellknown_metadata(0x01, "demo".bytes.to_a)
+    composite_metadata.add_wellknown_metadata(:APPLICATION_CBOR, "demo".bytes.to_a)
     composite_metadata.add_custom_metadata("a/b", "info".bytes.to_a)
     p composite_metadata
     p composite_metadata.get_all_metadata
