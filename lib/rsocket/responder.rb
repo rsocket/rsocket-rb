@@ -79,6 +79,7 @@ module RSocket
     include RSocket::AbstractRSocket
     @next_stream_id = -1
     @streams = {}
+    @attributes = {}
 
     def initialize(rsocket_responder)
       @rsocket_responder = rsocket_responder

@@ -12,6 +12,7 @@ module RSocket
 
   class RSocketRequester < RSocket::DuplexConnection
     include RSocket::AbstractRSocket
+    @attributes = {}
 
     #@param resp_handler_block [Proc]
     def initialize(metadata_encoding, data_encoding, setup_payload, resp_handler_block)

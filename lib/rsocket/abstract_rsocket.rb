@@ -6,6 +6,7 @@ module RSocket
   module AbstractRSocket
 
     attr_accessor :onclose
+    attr_accessor :attributes
 
     #@param payload [RSocket::Payload]
     def fire_and_forget(payload)
