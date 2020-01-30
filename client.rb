@@ -7,7 +7,7 @@ require 'rx'
 EventMachine.run {
   setup_composite = RSocket::CompositeMetadata.new
   setup_composite.add_wellknown_metadata(:RSOCKET_BEARER_TOKEN, "jwt_token".bytes.to_a)
-  rsocket = RSocket.connect("tcp://127.0.0.1:42253", setup_payload: payload_of(nil, setup_composite.to_bytes)) do
+  rsocket = RSocket.connect("tcp://127.0.0.1:42252", setup_payload: payload_of(nil, setup_composite.to_bytes)) do
     def request_response(payload)
       puts "request_response received: #{payload.data_utf8}"
       Rx::Observable.just(payload_of("data", "metadata"))
