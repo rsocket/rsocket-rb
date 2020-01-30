@@ -10,9 +10,17 @@ module RSocket
     attr_accessor :mode, :responder_handler, :uuid
 
     def receive_data(data)
-      frame_bytes = data.unpack('C*')
-      if frame_bytes.length >= 12
-        receive_frame_bytes(frame_bytes)
+      # data may contains multi frames
+      data_bytes = data.unpack('C*')
+      data_length = data_bytes.length
+      offset = 0
+      if data_bytes.length >= 12
+        while offset <= data_length - 12
+          length_bytes = data_bytes[offset, 3]
+          frame_length = (length_bytes[0] << 16) + (length_bytes[1] << 8) + length_bytes[2]
+          receive_frame_bytes(data_bytes[offset, frame_length + 3])
+          offset = offset + frame_length + 3
+        end
       end
     end
 
@@ -46,9 +54,7 @@ module RSocket
       end
     end
 
-    def receive_setup(setup_frame)
-
-    end
+    def receive_setup(setup_frame) end
 
     def receive_response(payload_frame)
       raise "not implemented for message pair"
