@@ -8,7 +8,7 @@ GEM
   specs:
     eventmachine (1.2.7)
     minitest (5.11.3)
-    rake (10.5.0)
+    rake (12.3.3)
     rx (0.0.3)
 
 PLATFORMS
@@ -18,7 +18,7 @@ DEPENDENCIES
   bundler (~> 2.0)
   eventmachine
   minitest (~> 5.0)
-  rake (~> 10.0)
+  rake (~> 12.3)
   rsocket-rb!
   rx
 
