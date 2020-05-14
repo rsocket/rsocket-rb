@@ -130,7 +130,7 @@ module RSocket
 
 
   #@return [ExplicitMimeTypeEntry]
-  # @param routing [String]
+  #@param routing [String]
   def self.routing_metadata(routing, *tags)
     bytes = []
     routing_bytes = routing.unpack("C*")
@@ -142,6 +142,17 @@ module RSocket
       bytes.append(*tag_bytes)
     }
     ReservedMimeTypeEntry.new(0x7E, bytes)
+  end
+
+  #@return [ExplicitMimeTypeEntry]
+  #@param routing [String]
+  def self.auth_bearer_metadata(bearer)
+    bytes = []
+    # bearer type
+    bytes.append(0x81)
+    bearer_bytes = bearer.unpack("C*")
+    bytes.append(*bearer_bytes)
+    ReservedMimeTypeEntry.new(0x7C, bytes)
   end
 
   #@param data_encoding [Symbol]
