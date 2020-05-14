@@ -61,7 +61,6 @@ module RSocket
     APPLICATION_CLOUDEVENTS_JSON = WellKnownType.new("application/cloudevents+json", 0x28, :APPLICATION_CLOUDEVENTS_JSON)
     # ... reserved for future use ...
     RSOCKET_DATA_ENCODING = WellKnownType.new("message/x.rsocket.data.encoding.v0", 0x52, :RSOCKET_DATA_ENCODING)
-    RSOCKET_BEARER_TOKEN = WellKnownType.new("message/x.rsocket.authentication.bearer.v0", 0x55, :RSOCKET_BEARER_TOKEN)
     # ...
     RSOCKET_MESSAGE_MIMETYPE = WellKnownType.new("message/x.rsocket.mime-type.v0", 0x7A, :RSOCKET_MESSAGE_MIMETYPE)
     RSOCKET_ACCEPT_MIMETYPES = WellKnownType.new("message/x.rsocket.accept-mime-types.v0", 0x7B, :RSOCKET_ACCEPT_MIMETYPES)
