@@ -2,14 +2,15 @@ module RSocket
 
   class ByteBuffer
 
-    attr_reader :pos, :size
+    attr_reader :reader_index, :writer_index, :capacity
 
     # create buffer from byte array
     # @param bytes [Array] byte array
     def initialize(bytes)
       @buffer = bytes
-      @pos = 0
-      @size = bytes.length
+      @reader_index = 0
+      @writer_index = 0
+      @capacity = @buffer.length
     end
 
     # clear buffer
@@ -17,20 +18,25 @@ module RSocket
       @buffer.clear
     end
 
-    def has_remaining
-      @pos < @size
+    def is_readable
+      @reader_index < @capacity
+    end
+
+    def is_writable
+      @writer_index < @capacity
     end
 
     def append(data)
       @buffer.push(*data)
-      @size = @buffer.length
+      @writer_index = @reader_index + data.length
+      @capacity = @buffer.length
     end
 
     # get byte
     def get
-      if @pos < @size
-        @pos = @pos + 1
-        @buffer[@pos - 1]
+      if @reader_index < @capacity
+        @reader_index = @reader_index + 1
+        @buffer[@reader_index - 1]
       end
     end
 
@@ -41,16 +47,18 @@ module RSocket
     # get bytes
     def get_bytes(len)
       if len > 0
-        if @pos + len <= @size
-          @pos = @pos + len
-          @buffer[(@pos - len)..(@pos - 1)]
+        if @reader_index + len <= @capacity
+          @reader_index = @reader_index + len
+          @buffer[(@reader_index - len)..(@reader_index - 1)]
         end
       end
     end
 
     def get_remain
-      if @pos <= @size
-        @buffer[@pos, @size]
+      if @reader_index < @capacity
+        offset = @reader_index
+        @reader_index = @capacity
+        @buffer[offset, @reader_index]
       end
     end
 
@@ -72,19 +80,19 @@ module RSocket
       ByteBuffer.bytes_to_integer(get_bytes(2))
     end
 
-
     def put(byte)
       @buffer[@pos] = byte
-      @pos = @pos + 1
+      @writer_index = @reader_index + 1
     end
 
     # puts bytes
     # @param bytes [Array]
     def put_bytes(bytes)
       bytes.each do |x|
-        @buffer[@pos] = x
-        @pos = @pos + 1
+        @buffer[@writer_index] = x
+        @writer_index = @writer_index + 1
       end
+      @capacity = @buffer.length
     end
 
     def put_int64(integer)
@@ -104,7 +112,16 @@ module RSocket
     end
 
     def rewind
-      @pos = 0
+      @reader_index = 0
+      @writer_index = 0
+    end
+
+    def reset_reader_index
+      @reader_index = 0
+    end
+
+    def reset_writer_index
+      @writer_index = 0
     end
 
     def to_s
