@@ -49,7 +49,7 @@ module RSocket
     def get_all_metadata
       all_metadata = []
       byte_buffer = RSocket::ByteBuffer.new(@source)
-      while byte_buffer.has_remaining
+      while byte_buffer.is_readable
         mime_type_id = byte_buffer.get
         if mime_type_id > 0x80
           metadata_length = byte_buffer.get_int24
@@ -120,7 +120,7 @@ module RSocket
     def tags
       tags = []
       buffer = RSocket::ByteBuffer.new(@source)
-      while buffer.has_remaining
+      while buffer.is_readable
         tag_length = buffer.get
         tags << buffer.get_bytes(tag_length).pack("C*")
       end

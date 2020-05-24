@@ -95,7 +95,7 @@ module RSocket
           frame.metadata = buffer.get_bytes(metadata_length)
         end
 
-        if buffer.has_remaining
+        if buffer.is_readable
           frame.data = buffer.get_remain
         end
       end
