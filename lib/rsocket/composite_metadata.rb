@@ -20,8 +20,14 @@ module RSocket
     # @param mime_type_symbol [Symbol]
     # @param content [Array]
     def add_wellknown_metadata(mime_type_symbol, content)
-      content_length = content.length
       mime_type_id = RSocket::WellKnownTypes::MIME_TYPES_BY_SYMBOL[mime_type_symbol].identifier
+      add_wellknown_metadata_from_id(mime_type_id, content)
+      self
+    end
+
+    #noinspection RubyNilAnalysis
+    def add_wellknown_metadata_from_id(mime_type_id, content)
+      content_length = content.length
       bytes = Array.new(4 + content_length, 0x00)
       bytes[0] = mime_type_id | 0x80
       bytes[1, 3] = RSocket::ByteBuffer.integer_to_bytes(content_length)[1..3]
@@ -32,7 +38,13 @@ module RSocket
 
     # @param mime_type [String]
     # @param content [Array]
+    #noinspection RubyNilAnalysis
     def add_custom_metadata(mime_type, content)
+      known_type = RSocket::WellKnownTypes::MIME_TYPES_BY_NAME[mime_type]
+      unless known_type.nil?
+        add_wellknown_metadata_from_id(known_type.identifier, content)
+        return self
+      end
       mime_type_bytes = mime_type.bytes.to_a
       mime_type_length = mime_type_bytes.length
       content_length = content.length
@@ -42,6 +54,12 @@ module RSocket
       bytes[mime_type_length + 1, 3] = RSocket::ByteBuffer.integer_to_bytes(content_length)[1..3]
       bytes[mime_type_length + 4, content_length] = content
       @source.push(*bytes)
+      self
+    end
+
+    # @param entry [CompositeMetadataEntry]
+    def add_metadata_entry(entry)
+      add_custom_metadata(entry.get_mime_type, entry.get_content)
       self
     end
 
