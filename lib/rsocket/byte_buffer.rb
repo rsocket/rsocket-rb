@@ -81,8 +81,8 @@ module RSocket
     end
 
     def put(byte)
-      @buffer[@pos] = byte
-      @writer_index = @reader_index + 1
+      @buffer[@writer_index] = byte
+      @writer_index = @writer_index + 1
     end
 
     # puts bytes
