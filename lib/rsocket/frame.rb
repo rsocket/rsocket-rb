@@ -86,6 +86,8 @@ module RSocket
         frame = PayloadFrame.new(stream_id, flags)
       when :METADATA_PUSH
         frame = MetadataPushFrame.new
+      when :ERROR
+        frame = ErrorFrame.new(stream_id)
       else
         # type code here
       end
